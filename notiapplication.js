@@ -4,7 +4,7 @@ var aeId = "S"+"notiapplication";
 var aeName = "notiapplication";
 var aeIp = "127.0.0.1";
 var aePort = 4000;
-var sub_Container = "/Mobius/test/DATA"; //
+var sub_Container = "/Mobius/lumi/DATA"; //
 var threshold = 300;
 var count = 0;
 var arr_container = [];
@@ -26,29 +26,29 @@ app.listen(aePort, function () {
 
 var lamp_value = 0;
 app.post("/"+aeId, function (req, res) {
-	console.log("\n[NOTIFICATION]")
-	console.log(req.body);
-	var content = req.body["m2m:sgn"].nev.rep["m2m:cin"]
-		if(content.con != undefined) {
-			content = content.con;
-			console.log("Receieved luminosity: " + content);
-			if (content > threshold && lamp_value == 1) {
-				console.log("High luminosity => Switch lamp to 0");
-				for (var i = 0; i < arr_container.length; i++) {
-					createContenInstance(i, "0");
-				}
-				lamp_value = 0;
-			} else if (content < threshold && lamp_value == 0) {
-				console.log("Low luminosity => Switch lamp to 1");
-				for (var i = 0; i < arr_container.length; i++) {
-					createContenInstance(i, "1");
-				}
-				lamp_value = 1;
-			} else {
-				console.log("Nothing to do");
+	var req_body = req.body["m2m:sgn"].nev.rep["m2m:cin"];
+	if(req_body != undefined) {
+		console.log("\n[NOTIFICATION]")
+		console.log(req_body);
+		var content = req_body.con;
+		console.log("Receieved luminosity: " + content);
+		if (content > threshold && lamp_value == 1) {
+			console.log("High luminosity => Switch lamp to 0");
+			for (var i = 0; i < arr_container.length; i++) {
+				createContenInstance(i, "0");
 			}
-			res.sendStatus(200);
+			lamp_value = 0;
+		} else if (content < threshold && lamp_value == 0) {
+			console.log("Low luminosity => Switch lamp to 1");
+			for (var i = 0; i < arr_container.length; i++) {
+				createContenInstance(i, "1");
+			}
+			lamp_value = 1;
+		} else {
+			console.log("Nothing to do");
 		}
+		res.sendStatus(200);
+	}
 });
 
 createAE();
